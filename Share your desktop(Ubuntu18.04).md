@@ -1,3 +1,7 @@
+## Introduction
+I just found that there is no need to install vnc server for some remote uses. So this is the screen sharing function that ubuntu18.04 already set for us. 
+
+Easy to start.
 
 ## Step1: Open the Screen Sharing function
 Open the Screen Sharing function from Ubuntu:
