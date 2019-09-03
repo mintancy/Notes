@@ -1,5 +1,5 @@
 
-## Open the Screen Sharing function
+## Step1: Open the Screen Sharing function
 Open the Screen Sharing function from Ubuntu:
 
 https://help.ubuntu.com/stable/ubuntu-help/sharing-desktop.html.en
@@ -10,8 +10,8 @@ You may get some errors when you try to connect your remote desktop. And there a
 
 https://dev.idoseek.com/vncview-remote-desktop-to-ubuntu/
 
-## Connect via Vnc Viewer from Your Own Computer
-If your remote system has some security policies that you can not direct link your remote desktop by using 
+## Step2: Connect via Vnc Viewer from Your Own Computer
+If your remote system has some security policies that you can not direct access your remote desktop by using 
 ```
 IP: port(default we use 5900, you can use other ports if you like)
 ```
