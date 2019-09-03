@@ -23,6 +23,8 @@ You may need to log in your remote system via ssh first using this command:
 ```
 ssh -L 5900:127.0.0.1:5900 username@IP
 ```
+This maps the ports of your remote computer to the local and performs vnc access in a safer way. I guess.
+
 Then go to vnc viewer connect the remote screen by typing: 
 ```
 127.0.0.1:5900
