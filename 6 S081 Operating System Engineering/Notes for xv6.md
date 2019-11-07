@@ -1,6 +1,6 @@
 # chap1
 
-##3 functions for OS:
+## 3 functions for OS:
 
 - share a computer among multiple programs and provide services
   - services provided through an interface(shell is common)
@@ -10,9 +10,9 @@
 - share hardware among multiple programs, make them run(or appear to run) at the same time
 - controll ways for programs to interact
 
-##xv6's services
+## xv6's services
 
-###Processes and memory
+### Processes and memory
 
 - user-space memory(instructions, data, and stack)
 - per-process state private to the kernel
@@ -106,7 +106,7 @@ if (fork() == 0) {
 
 
 
-###Pipes
+### Pipes
 
 pipe is a small kernel buffer exposed to processes as a pair of file descriptors, one fore reading and one for writing.    processes communication
 
@@ -116,7 +116,7 @@ pipe is a small kernel buffer exposed to processes as a pair of file descriptors
 
 
 
-###file system
+### file system
 
 
 
