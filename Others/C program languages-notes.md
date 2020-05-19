@@ -1,3 +1,10 @@
+1. [Chapter 1](#chap1)
+2. [Chapter 2](#chap2)
+3. [Chapter 3](#chap3)
+4. [Chapter 4](#chap4)
+5. [Chapter 5](#chap5)
+
+<a name="chap1"></a>
 # Chapter 1
 
 'stdio.h' is a standard input/output library from ANSI, not a part of the C language.
@@ -44,6 +51,7 @@ extern is used when different files want to call the same variable.
 "Definition" refers to the place where the variable is created or assigned storage; "declaration" refers to places where the nature of the variable is
 stated but no storage is allocated.
 
+<a name="chap2"></a>
 # Chapter 2
 
 Lower case for variable names, and all upper case for symbolic canstants.
@@ -245,12 +253,14 @@ int lower(int c)
 }
 ```
 
+<a name="chap3"></a>
 # Chapter 3 - Control Flow
 
 In `switch` statement, the break statement causes an immediate eaxit from the `switch`. Because cases serve just as labels, after the code for one case is done, execution falls through to the next unless you take explicit action to escape.
 
 `goto and labels`: break out of two or more loops at once. 
 
+<a name="chap4"></a>
 # Chapter 4 - Functions and Program Structure
 
 If the return type is omitted, int is assumed.
@@ -342,4 +352,152 @@ C provides certain language facilities by means of a preprocessor, which is conc
     /* hdr.h 文件的内容放在这里 */
     #endif
     ```
+<a name="chap5"></a>
+# Chapter 5 - Pointer and Array
+
+void * (char *), general pointer
+
+& and *:
+```c
+int x = 1, y = 2, z[10];
+int *ip;    /* ip is a pointer to int */
+ip = &a;    /* ip now points to x */
+y = *ip;    /* y is now 1 */
+*ip = 0;    /* x is now 0 */
+ip = &z[0]; /* ip now points to z[10] */
+```
+
+swap:
+```c
+void swap (int *px, int *py) {
+    int temp;
+
+    temp = *px;
+    *px = *py;
+    *py = temp;
+}
+```
+
+`*(pa + i) = a[i];`
+
+`char a[]` equals to `char *a`, `f(&a[2])` equals to f(a+2).
+
+`<stddef.h>: NULL`.
+
+`size_t` is the unsigned integer type returned by the `sizeof` operator.
+
+> The valid pointer operations are assignement of pointers of the same type, adding or subtracting a pointer and an integer, subtracting or comparing two pointers to members of the same array, and assigning ot compating to zero. All other pointer arithmetic is illegal: add two pointers, mutiply ot divide or shitf or mask them, add float or double to them, or except for void *, to assign a pointer of one type to a pointer of another type withou a cast.
+
+```c
+/* strcpy */
+void strcpy(char *s, char *t){
+    int i;
+
+    i = 0;
+    while ((s[i] == t[i]) != '\0')
+        i++;
+}
+
+or
+
+void strcpy(char *s, char *t){
+    while (*s++ = *t++)
+        ;
+}
+
+/* strcmp: return < 0 if s < t, o if s == t, > 0 if s > t */
+int strcmp(char *s, char *t) {
+    for (; *s == *t; s++, t++)
+        if (*s == '\0')
+            return 0;
+    return *s - *t;
+}
+
+*p++ = val      // push
+val = *--p;     // pop
+```
+
+### Multi-dimensional Arrays
+
+```c
+f(int daytab[2][13])
+f(int daytab[][13])
+f(int (*daytab)[13])
+```
+
+### Initialization of Pointer Arrays
+
+```c
+/* month_name: return name of n-th month */
+char *month_name(int n)
+{
+static char *name[] = {
+    "Illegal month",
+    "January", "February", "March",
+    "April", "May", "June",
+    "July", "August", "September",
+    "October", "November", "December"
+};
+```
+
+### Pointers vs. Multi-dimensonal Arrays
+Two declaration:
+```c
+int a[10][20];
+int *b[10];
+```
+a is a true two-dimensional array: 200 int-sized locations have been set aside, and the conventional rectangular subscript calculation 20 * row +col is used to find the element a[row,col] . 
+
+For b, however, the definition only allocates 10 pointers and does not initialize them; initialization must be done explicitly, either statically or with code.
+
+The important advantage of the pointer array is that the rows of the array may be of different lengths.
+
+### Command-line Arguments
+
+```c
+#include <stdio.h>
+#include <string.h>
+#define MAXLINE 1000
+int getline(char *line, int max);
+
+/* find: print lines that match pattern from 1st arg */
+main(int argc, char *argv[])
+{
+    char line[MAXLINE];
+    long lineno = 0;
+    int c, except = 0, number = 0, found = 0;
+    while (--argc > 0 && (*++argv)[0] == '-')
+        while (c = *++argv[0])
+            switch (c) {
+            case 'x':
+                except = 1;
+                break;
+            case 'n':
+                number = 1;
+                break;
+            default:
+                printf("find: illegal option %c\n", c);
+                argc = 0;
+                found = -1;
+                break;
+            }
+    if (argc != 1)
+        printf("Usage: find -x -n pattern\n");
+    else
+        while (getline(line, MAXLINE) > 0) {
+            lineno++;
+            if ((strstr(line, *argv) != NULL) != except) {
+                if (number)
+                    printf("%ld:", lineno);
+                printf("%s", line);
+                found++;
+            }
+        }
+    return found;
+}
+```
+
+### Pointers to Functions
+
+In C, a function itself is not a variable, but it is possible to define pointers to functions, which can be assigned, places in arrays, passed to functions, returned by functions, and so on.
 
