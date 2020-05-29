@@ -3,6 +3,7 @@
 3. [Chapter 3](#chap3)
 4. [Chapter 4](#chap4)
 5. [Chapter 5](#chap5)
+5. [Chapter 6](#chap6)
 
 <a name="chap1"></a>
 # Chapter 1
@@ -500,4 +501,85 @@ main(int argc, char *argv[])
 ### Pointers to Functions
 
 In C, a function itself is not a variable, but it is possible to define pointers to functions, which can be assigned, places in arrays, passed to functions, returned by functions, and so on.
+
+<a name="chap6"></a>
+# Chapter 6 - Structures and Fucntions
+
+### Union
+a single variable that can legitimately hold any one of several types.
+
+```c
+union u_tag {
+    int ival;
+    float fval;
+    char * sval;
+} u;
+```
+
+The variable u will be large enough to hold the largest of the three types; the specific size if implementation-dependent.
+
+### Bit-fields
+
+When storage space is at a premium, it may be necessary to pack several objects into a single machine word; one common use is a set of single-bit flags in applications like compiler symbol tables.
+
+For example: masks
+```c
+    #define KEYWORD     01
+    #define EXTERNAL    02
+    #define STATIC      04
+    //or
+    enum {KEYWORD = 01, EXTERNAL = 02, STATIC = 04};
+```
+The numbers must be powers of two.
+
+`flags |= EXTERNAL | STATIC;` turns on the `EXTERNAL` and `STATIC` bits in flags, while `flags &= ~(EXTERNAL | STATC);` turns them off, and `if ((flags & (EXTERNAL | STATUC)) == 0) ...` is ture if both bits are off.
+
+Uses bit-fields, we can define those adjacent bits within a single implementation-define storage unit that we will call a "word".
+
+```c
+    struct {
+        unsigned int is_keyword : 1;
+        unsigned int is_extern  : 1;
+        unsigned int is_static  : 1;
+    } flags;
+```
+
+This defiens a variable called `flags` that contains three 1-bit fields.
+
+```c
+flags.is_extern = flags.is_static = 1;  // turn on
+flags.is_extern = flags.is_static = 0;  // turn off
+if (flags.is_extern == 0 && flags.is_static == 0) ...
+```
+
+<a name="chap7"></a>
+# Chapter 7 - Input and Output
+
+`<ctype.h>`: `tolower` converts an upper case letter to lower case, and returns other characters untouched.
+
+### Formatted Output - Printf
+
+d,i:    int; decimal number.
+o:      int; unsigned octal number (without a leading zero).
+x, X:   int; unsigned hexadecimal number (without a leading 0x or oX), using abcdef or ABCDEF for 10, ..., 15.
+u:      int; unsigned decimal number.
+c:      int; single character.
+s:      char *; print characters from the string until a '\0' or the number of characters given by the precision.
+f:      double; [-]m.dddddd, where the number of d's is given by the precision (default 6).
+e, E:   double; [-]m.dddddd e+-xx or [-]m.dddd E+-xx, where the number of d's is given by the precision (default 6).
+g, G:   double; use %e or %E if the exponent is less than -4 or greater than or equal to the presicion; otherwise use %f. Trailing zeros and a trailing decimal point are not printed.
+p:      void *; pointer (implementation-dependent representation).
+%:      no argument is converted; print a %.
+
+### File Access
+
+```c
+FILE *fp;
+FILE *fopen(char *name, char *mode);
+
+int getc(FILE *fp);
+int puts(int c, FILE *fp);
+```
+
+### Others
 
