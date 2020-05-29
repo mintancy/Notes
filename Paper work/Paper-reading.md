@@ -149,18 +149,18 @@ Features:
 - simple addressing modes; 
 - instructions that combine a shift with an arithmetic and logical operation.
 
-TrustZone V.S. Secure Elemetn/TPM
+**TrustZone V.S. Secure Elemetn/TPM**
 
 ​	integrated
 
-Intel TX and SGX
+**Intel TX and SGX**
 
 ​	different hardware support
 
-TI M-Shield and AMD
+**TI M-Shield and AMD**
 
 ​	Another implementation of TZ: AMD uses TrustZone in its 64-bit Advanced Processing Units(APU’s). TI integrated TrustZone into its M-Shield Security framework used in the OMAP2 and OMAP3 processors
 
-Virtualization
+**Virtualization**
 
 ​	Both Hypervisor and TrustZone can be used for out of VM kernel monitoring.
