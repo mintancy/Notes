@@ -1,11 +1,12 @@
-## S & P 2020
+# ARM TrustZone
 
-------------
+## 2020
 
 ### OAT: Attesting Operation Integrity of Embedded Devices
 
-> Zhichuang Sun, Bo Feng, Long Lu (Northeastern University), Somesh Jha (University of Wisconsin)
+> S&P 2020 
 >
+> Zhichuang Sun, Bo Feng, Long Lu (Northeastern University), Somesh Jha (University of Wisconsin)
 
 **Concepts**
 
@@ -60,10 +61,10 @@ CPS: Cyber-Physical System
 
 
 
----
-
 ### KARONTE: Detecting Insecure Multi-binary Interactions in Embedded Firmware
 
+> S&P 2020 
+>
 > Nilo Redini ∗ , Aravind Machiry ∗ , Ruoyu Wang † , Chad Spensky ∗ , Andrea Continella ∗ , Yan Shoshitaishvili † , Christopher Kruegel ∗ , and Giovanni Vigna ∗
 >
 > UC Santa Barbara † Arizona State University
@@ -124,9 +125,49 @@ Sinks: memcpy-like functions and attacker-controlled loops
     - check whether their truthfulness completely depends on attacker-controlled data, raise an alert
     - consider every disconnected node in the BFG, and perform a single-binary static analysis
 
+# 2019
+
+## Safe and Efficient Implementation of a Security System on ARM using Intra-level Privilege Separation
+
+> Link: https://dl.acm.org/doi/pdf/10.1145/3309698      ACM Transactions on Privacy and Security (TOPS)
+>
+> Authors: Donghyun  Kwon, Hayoon  Yi, Yeongpil  Cho, Yunheung  Paek
+>
+> **Hilps**
+
+Concept: monitoring approach that observes the behavior of software execution and takes remedial action if violations against a security policy.
+
+- intrusion detection, sandboxing, firewalls, and antiviruses
+
+Ideal monitoring:
+
+- have a complete view of the monitored system software
+- be protected to ensure the integrity of the monitoring process
+
+Current work: **privilege layers**. Two problems:
+
+- runtime overhead because of expensive context-switches between the different privileged layers.
+- or no higher privileged layer for security tool to run
+
+Solution -- **intra-level security systems**: break the original system software into two domains: inner for security tools and outer for remains
+
+- intra-level isolation: memory region of the inner domain must be isolated from the potentially compromised outer domain in the same privilege level.
+  - rely on some hardware features: write-protection (WP) bit of the x86-64
+  - but no such wp bit on ARM devices
+- domain switching: the control switches between the two domains must be performed in a tamper-proof and lightweight manner.
+
+Hilps:
+
+- AArch64 consider the TxSZ as the WP bit
+  - expand or reduce the range of the valid (or accessible) virtual address space dynamically.
+  - dynamic virtual address range adjustment
+- sandbox to force security tools to tun in isolation from each other
+
+Platform: versatile express V2MJuno r1
 
 
----
+
+## 2016
 
 ### TrustZone Explained: Architectural Features and Use Cases
 
@@ -164,3 +205,6 @@ Features:
 **Virtualization**
 
 ​	Both Hypervisor and TrustZone can be used for out of VM kernel monitoring.
+
+
+
