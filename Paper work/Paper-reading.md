@@ -165,6 +165,41 @@ Hilps:
 
 Platform: versatile express V2MJuno r1
 
+Background:
+
+Virtual Address Range
+
+- Virtual address translation management: two types of core registers except EL0
+  - first type: Translation Table Base Register (**TTBRs**) hold the base physical address of the current page table for mapping between virtual and physical addresses. 48-bit (256TB)
+    - level 1: two registers: TTBRs_EL1 for applications and TTBR1_EL1 for OS 
+    - other levels: one register: TTBR0_EL2 at EL2 and TTBR0_EL3 at EL3.
+    - TTBR0_ELx is used to translate the virtual address space starting from the bottom (0x0), and TTBR1_EL1 is used to translate the virtual address space starting from the top (0xFFFF_FFFF_FFFF_FFF)
+  - second type: Translation Control Registers (177065.4) determin various deatures related to address translation at each exception level.
+    - two fields T0SZ and T1SZ within TCR_ELx are used to define the valid virtual address ranges vary with the values of TCR_ELx.T0SZ and TCR_EL1.T1SZ.
+
+Once TxSZ is programmed, any memory access exceeding the virtual address range is forbidden, and the system generates a translation faults if violated.
+
+TLB is used for virtual-to-physical address mapping, flushing at every context switch. Address Space Identifier (ASID) at EL0 and EL1 is supported by AArch64 to eliminate the redundant TLB flushes. ASID is defined by TTBR on AArch64, TCR_EL1.A1 decide which ASID of these registers becomes the current ASID.
+
+- Caching them in the TLB with multiple ASIDs might degrade performance, because it increases TLB pressure. non-Global (nG) flag in the page table descriptor is used.
+
+Design: two core mechanism for enabling intra-level scheme (intra-level isolation and the domain switching) and the sandbox mechanism to isolate each security tool running in the inner domain.
+
+- Divides system software into the inner domain and outer domain
+  - dynamically adjusting the range of the virtual address space enables the isolation and concealment of memory for the inner domain
+  - each domain is assigned different acess permissions for memory blocks
+  - sandbox is used to isolate security tolls individually
+
+![image-20200609122443766](/Users/tancy/Library/Application Support/typora-user-images/image-20200609122443766.png)
+
+
+
+
+
+
+
+
+
 
 
 ## 2016
