@@ -188,7 +188,7 @@ Design: two core mechanism for enabling intra-level scheme (intra-level isolatio
 - Divides system software into the inner domain and outer domain
   - dynamically adjusting the range of the virtual address space enables the isolation and concealment of memory for the inner domain
   - each domain is assigned different acess permissions for memory blocks
-  - sandbox is used to isolate security tolls individually
+  - sandbox is used to isolate security tools individually
 
 ![image-20200609122443766](/Users/tancy/Library/Application Support/typora-user-images/image-20200609122443766.png)
 
