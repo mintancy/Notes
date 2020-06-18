@@ -957,9 +957,11 @@ Display DAG after it is built, before optimization:
 
 ```shell
 $ llc -view-dag-combine1-dags test.ll
-```
+Writing 'tmp/dag._xxx.dot'... done
+Trying 'xdg-open' program... Remember to erase graph file: /tmp/dag._xxx.dot
 
-My LLVM does not support the -view* uption, `cmake -DCMAKE_BUILD_TYPE:STRING=Debug`
+$ dot -Tpng /tmp/dag._xxx.dat > test.png
+```
 
 Display the DAG defore legalization:
 
@@ -994,4 +996,345 @@ $ llc -view-sunit-dags test.ll
 view graphs in debug mode: <http://llvm.org/docs/ProgrammersManual.html#viewing-graphs-while-debugging-code>
 
 ## Describing targets using TableGen
+
+> TableGen is a tool for backend developers that describes their target machine with a declarative language-*.td. The *.td files will be converted to enums, DAG-pattern matching functions, instruction encoding/decoding functions, and so on, which can then be used in other C++ files for coding.
+>
+> To define registers and the register set in the target description's .td files, tablegen will convert the intended .td file into .inc files, which will be #include syntax in our .cpp files referring to the registers.
+
+
+
+> Assuming the sample target machine has four registers, r0-r3; a stack register, sp; and a link register, lr. These can be specified in the SAMPLERegisterInfo.td file. TableGen provides the Register class, which can be extended to specify registers.
+
+```shell
+# create a new folder in lib/Target named SAMPLE
+$ mkdir llvm_root_directory/lib/Target/SAMPLE
+# Create a new file called SAMPLERegisterInfo.td in the new SAMPLE folder:
+$ cd llvm_root_directory/lib/Target/SAMPLE 
+$ vi SAMPLERegisterInfo.td
+```
+
+Define the hardware encoding , namespace, registers, and register class:
+
+```xml
+class SAMPLEReg<bits<16> Enc, string n> : Register<n> { 
+  let HWEncoding = Enc; 
+  let Namespace = "SAMPLE"; 
+}
+foreach i = 0-3 in {
+	def R#i : R<i, "r"#i >;
+}
+def SP : SAMPLEReg<13, "sp">;
+def LR : SAMPLEReg<14, "lr">;
+def GRRegs : RegisterClass<"SAMPLE", [i32], 32, (add R0, R1, R2, R3, SP)>;
+```
+
+TableGen processes this .td file to generate the .inc files, which habe registers represented in the form of enums that can be used in the .cpp files. These .inc files will be generated when we build the LLVM project.
+
+<X86RegisterInfo.td file located at llvm_source_ code/lib/Target/X86/>
+
+## Defining an instruction set
+
+How instruction sets are defined for the target architecture: operands, an assembly string, and an instruction pattern. 
+
+```shell
+# create a new file called SAMPLEInstrInfo.td in the lib/Target/SAMPLE folder
+$ vi SAMPLEInstrInfo.td
+
+def ADDrr : InstSAMPLE<(outs GRRegs:$dst), 
+						(ins GRRegs:$src1, GRRegs:$src2), 
+						"add $dst, $src1, $src2", 
+						[(set i32:$dst, (add i32:$src1, i32:$src2))]>;
+```
+
+> The add register instruction specifies \$dst as the resultant operand, which belongs to the general register type class; the \$src1 and ​\$src2 inputs as two input operands, which also belong to the general register class; and the instruction assembly string as add ​\$dst, ​\$src1, ​\$src2, which is of the 32-bit integer type.
+
+add r0, r0, r1
+
+For more detailed information on various types of instruction sets for advanced architecture, such as the x86, refer to the X86InstrInfo.td file located at lib/Target/X86/
+
+## Adding a machine code descriptor
+
+Convert LLVM IR abstract blocks into machin-specific blocks. MachinFunction, MachinBasicBlock, and MachineInstr.
+
+> Machine instructions are instances of the MachineInstr class. This class is an extremely abstract way of representing machine instructions. In particular, it only keeps track of an opcode number and a set of operands. The opcode number is a simple unsigned integer that has a meaning only for a specific backend.
+
+MachinInstr.cpp
+
+```c++
+// MachinInstr constructor creates an object of MachineInstr class and adds the implicit operands. It reserves space for the number of operands specified by the MCInstrDesc class
+MachineInstr::MachineInstr(MachineFunction &MF, const MCInstrDesc &tid, const DebugLoc dl, bool NoImp)
+  : MCID(&tid), Parent(nullptr), Operands(nullptr), NumOperands(0), 
+		Flags(0), AsmPrinterFlags(0), NumMemRefs(0), MemRefs(nullptr), debugLoc(dl) { 
+      // Reserve space for the expected number of operands. 
+    if (unsigned NumOps = MCID->getNumOperands() + MCID->getNumImplicitDefs() + MCID->getNumImplicitUses()) {
+      CapOperands = OperandCapacity::get(NumOps);
+      Operands = MF.allocateOperandArray(CapOperands); 
+    }
+    if (!NoImp) 
+      addImplicitDefUseOperands(MF);
+}
+
+// addOperand function adds the specified operand to the instruction. If it is an implicit operand, it is added at the end of the operand list. If it is an explicit operand, it is added at the end of the explicit operand list.
+void MachineInstr::addOperand(MachineFunction &MF, const MachineOperand &Op) { 
+  assert(MCID && "Cannot add operands before providing an instr descriptor"); 
+  if (&Op >= Operands && &Op < Operands + NumOperands) { 
+    MachineOperand CopyOp(Op); 
+    return addOperand(MF, CopyOp); 
+  } 
+  unsigned OpNo = getNumOperands(); 
+  bool isImpReg = Op.isReg() && Op.isImplicit(); 
+  if (!isImpReg && !isInlineAsm()) { 
+    while (OpNo && Operands[OpNo-1].isReg() && Operands[OpNo1].isImplicit()) { 
+      --OpNo; 
+      assert(!Operands[OpNo].isTied() && "Cannot move tied operands"); 
+    } 
+  }
+  #ifndef NDEBUG 
+  bool isMetaDataOp = Op.getType() == MachineOperand::MO_Metadata; 
+  assert((isImpReg || Op.isRegMask() || MCID->isVariadic() || OpNo < MCID->getNumOperands() || isMetaDataOp) && "Trying to add an operand to a machine instr that is already done!"); 		#endif
+    
+    MachineRegisterInfo *MRI = getRegInfo(); 
+  OperandCapacity OldCap = CapOperands; 
+  MachineOperand *OldOperands = Operands; 
+  if (!OldOperands || OldCap.getSize() == getNumOperands()) { 
+    CapOperands = OldOperands ? OldCap.getNext() : OldCap.get(1); 
+    Operands = MF.allocateOperandArray(CapOperands); 
+    if (OpNo) 
+      moveOperands(Operands, OldOperands, OpNo, MRI); 
+  } 
+  if (OpNo != NumOperands) 
+    moveOperands(Operands + OpNo + 1, OldOperands + OpNo, NumOperands - OpNo, MRI);
+  ++NumOperands; 
+  if (OldOperands != Operands && OldOperands) 
+    MF.deallocateOperandArray(OldCap, OldOperands); 
+  MachineOperand *NewMO = new (Operands + OpNo) MachineOperand(Op); 
+  NewMO->ParentMI = this; 
+  if (NewMO->isReg()) { 
+    NewMO->Contents.Reg.Prev = nullptr; 
+    NewMO->TiedTo = 0; 
+    if (MRI) MRI->addRegOperandToUseList(NewMO); 
+    if (!isImpReg) { 
+      if (NewMO->isUse()) { 
+        int DefIdx = MCID->getOperandConstraint(OpNo, MCOI::TIED_TO); 
+        if (DefIdx != -1) 
+          tieOperands(DefIdx, OpNo); 
+      } 
+      if (MCID->getOperandConstraint(OpNo, MCOI::EARLY_CLOBBER) != -1) 
+        NewMO->setIsEarlyClobber(true); 
+    } 
+  } 
+}
+
+// addMemoperands function is defined to add the memory operands.
+void MachineInstr::addMemOperand(MachineFunction &MF, MachineMemOperand *MO) { 
+  mmo_iterator OldMemRefs = MemRefs; 
+  unsigned OldNumMemRefs = NumMemRefs; 
+  unsigned NewNum = NumMemRefs + 1; 
+  mmo_iterator NewMemRefs = MF.allocateMemRefsArray(NewNum); 
+  std::copy(OldMemRefs, OldMemRefs + OldNumMemRefs, NewMemRefs); 
+  NewMemRefs[NewNum - 1] = MO; 
+  setMemRefs(NewMemRefs, NewMemRefs + NewNum);		//setMemRefs function is the primary method for setting up a MachineInstr MemRefs list
+}
+```
+
+Although the MachineIntr class provides machine-instruction-creating methods, a dedicated function called BuildMI(), based on the MachinInstrBuilder class, is more convenient.
+
+## Implementing the MachineInstrBuilder class
+
+BuildMI() is used to build machine instructions. <include/llvm/CodeGen/MachinInstrBuilder.h>
+
+We can use BuildMI in code snippets for the  following purposes:
+
+1. To create a DestReg = mov 42 (rendered in the x86 assembly as mov DestReg, 42) instruction:
+
+   ```assembly
+   MachineInstr *MI = BuildMI(X86::MOV32ri, 1, DestReg).addImm(42);
+   ```
+
+2. To create the same instruction, but insert it at the end of a basic block:
+
+   ```assembly
+   MachineBasicBlock &MBB = BuildMI(MBB, X86,::MOV32ri, 1, DestReg).addImm(42);
+   ```
+
+3. To create the same instruction, but insert it before a pecified iterator point:
+
+   ```assembly
+   MachineBasicBlock::iterator MBBI = BuildMI(MBB, MBBI, X86::MOV32ri, 1, DestReg).addImm(42)
+   ```
+
+4. To create a self-looping branch instruction:
+
+   ```assembly
+   BuildMI(MBB, X86::JNE, 1).addMBB(&MBB);
+   ```
+
+## Implementing the MachineBasicBlock class
+
+> A MachineFunction class contain a series of MachineBasiBlocks classes. These MachineFunction classes map to LLVM IR functions that are given as input to the instruction selector. In addtition to a list of basic blocks, the MachineFucntion class contains the MachineConstantPool, MachineFrameInfro, MahcineFunctionInfo, and MachineRegisterInfo class.
+
+- `RegInfo` keeps information about each register that is in use in the function: `MachineRegisterInfo *RegInfo;`
+
+- `MachineFrameInfo` keeps track of objects allocated on the stack: `MachineFrameInfo *FrameInfo;`
+
+- `ConstantPool` keeps track of constants that have been spilled to the memory: `MachineConstantPool *ConstantPool;`
+- `JumpTableInfo` keeps track of jump tables for switch instructions: `MachineJumpTableInfo *JumpTableInfo;`
+
+- The list of machine basic blocks in the function:
+
+  `typedef ilist<MachineBasicBlock> BasicBlockListType; `
+
+  `BasicBlockListType BasicBlocks;`
+
+- The getFunction function returns the LLVM function that the current machine code represents: `const Function *getFunction() const { return Fn; }`
+
+- CreateMachineInstr allocates a new MachineInstr class: `MachineInstr *CreateMachineInstr(const MCInstrDesc &MCID, DebugLoc DL, bool NoImp = false);`
+
+>  The MachineFunction class primarily contains a list of MachineBasicBlock objects (typedef ilist<MachineBasicBlock> BasicBlockListType; BasicBlockListType BasicBlocks;), and defines various methods for retrieving information about the machine function and manipulating the objects in the basic blocks member.
+
+<A detailed implementation of the MachineFunction class can be found in the MachineFunction.cpp file located at lib/Codegen/>
+
+## Writing an instruction selector
+
+> LLVM uses the SelectionDAG representation to represent the LLVM IR in a low-level data-dependence DAG for instruction selection. Various simplifications and target-specific optimizations can be applied to the SelectionDAG representation. This representation is target-independent. It is a significant, simple, and powerful representation used to implement IR lowering to target instructions.
+
+The SelectionDAG class provides lots of target-independent methods to create SDNode of various kinds, and retrieves/computes useful information from the nodes in the SelectionDAG graph.
+
+
+
+## Legalizing SelectionDAG
+
+>  A selectionDAG representation is a target-independent representation of instructions and operands. However, a target may not always support the instruction or data type represented by SelectionDAG. In that sense, the initial SelectionDAG graph constructed can be called illegal. The DAG legalize phase converts the illegal DAG into a legal DAG supported by the target architecture.
+
+Two ways to convert unsupported data types into supported data types: by promoting smaller data types to larger data types, or by truncating larger data types into smaller ones. i8, i15 to i32. i64 to two i32.
+
+The SelectionDAGLegalize class consists of various data members, tracking data structures to keep a track of legalized nodes, and various methods that are used to operate on nodes to legalize them.
+
+Type legalization and instruction legalization.
+
+Type legalization:
+
+```shell
+$ cat test.ll 
+define i64 @test(i64 %a, i64 %b, i64 %c) {
+	%add = add nsw i64 %a, %b
+	%div = sdiv i64 %add, %c
+	ret i64 %div 
+}
+```
+
+To view the DAG before type legalization,
+
+```shell
+$ llc -view-dag-combine1-dags test.ll
+```
+
+After type legalization:
+
+```shell
+$ llc -view-dag-combine2-dags test.ll
+```
+
+Instruction legalization:
+
+```shell
+$ cat test.ll 
+define i32 @test(i32 %a, i32 %b, i32 %c) {
+	%add = add nsw i32 %a, %b
+	%div = sdiv i32 %add, %c
+	ret i32 %div 
+}
+```
+
+View the DAG before legalization:
+
+```shell
+$ llc –view-dag-combine1-dags test.ll
+```
+
+After legalization:
+
+```shell
+$ llc -view-dag-combine2-dags test.ll
+```
+
+## Optimizing SelectionDAG
+
+A SelectionDAG representation shows data and instructions in the form of nodes. minimized SelectionDAG
+
+DAGCombiner: some DAGCombine passes search for a pattern and then fold the patterns into a single DAG. This basically reduces the number of DAGs, while loweing DAGs. 
+
+<For a more detailed implementation of the optimized SelectionDAG class, see the DAGCombiner.cpp file located at lib/CodeGen/SelectionDAG/>
+
+## Selection instruction from the DAG
+
+After legalization and DAG combination, the SelectionDAG representation is in the optimized phase. 
+
+Input: target-independent DAG nodes, patterns (from the /td file)
+
+Output: DAG nodes (target-specific)
+
+`SelectionDAGISel` is the common base class used for pattern-matching instruction selectors that are based on SelectionDAG. It inherits the MachineFunctionPass class. It has various functions used to determine the legality and profitability of operations such as folding.
+
+```c++
+class SelectionDAGISel : public MachineFunctionPass {...}
+```
+
+The `TablGen` class helps select target-specific instructions.
+
+The `CodeGenAndEmitDAG` function calls the `DoInstructionSelection` function, which visites each DAG node and calls the `Select` function for each node.
+
+```c++
+SDNode *ResNode = Select(Node);
+```
+
+The `Select` function is an abstract method implemented by the targets. The X86 target implements it in the `X86DAGToDAGISel::Select` function. The `X86DAGToDAGISel::Select()` function intercepts some nodes for manual matching, but delegates the bulk of the work to the `X86DAGToDAGISel::SelectCode()` function.
+
+The `X86DAGToDAGISel::SelectCode` function is autogenerated by TableGen. It contains the matcher table, followed by a call to the generic `SelectionDAGISel::SelectCodeCommon()` function, passing it the table.
+
+```shell
+$ cat test.ll 
+define i32 @test(i32 %a, i32 %b, i32 %c) {
+	%add = add nsw i32 %a, %b
+	%div = sdiv i32 %add, %c
+	ret i32 %div 
+}
+```
+
+<To see the detailed implementation of the instruction selection, take a look at the SelectionDAGISel.cpp file located at lib/CodeGen/SelectionDAG/>
+
+
+
+## Scheduling instructions in SelectionDAG
+
+SelectionDAG nodes consisting of target-supported instructions and operands. However, the code is still in DAG representation. The next step is to schedule the SelectionDAG nodes.
+
+> A scheduler assigns the order of execution of instructions from the DAG. In this process, it takes into account various heuristics, such as register pressure, to optimize the execution order of instructions and to minimize latencies in instruction execution. After assigning the order of execution to the DAG nodes, the nodes are converted into a list of MachineInstrs and the SelectionDAG nodes are destroyed.
+
+The ScheduleDAG class is a base class for other schedulers to inherit, and it provides only graph-related manipulation operations such as an iterator, DFS, topological sorting, functions for moving nodes around, and so on.
+
+```c++
+class ScheduleDAG { 
+public:
+	const TargetMachine &TM; 									// Target processor
+  const TargetInstrInfo *TII; 							// Target instruction
+  const TargetRegisterInfo *TRI; 						// Target processor register info 
+  MachineFunction &MF; 											// Machine function	
+  MachineRegisterInfo &MRI; 								// Virtual/real
+  register map std::vector<SUnit> SUnits; 	// The scheduling
+  units.SUnit EntrySU; 											// Special node for the region entry
+	SUnit ExitSU; 														// Special node for the region exit
+
+	explicit ScheduleDAG(MachineFunction &mf);
+
+	virtual ~ScheduleDAG();
+  ..
+}
+```
+
+The SelectionDAG class takes into account various heuristics, such as register pressure, spilling cost, live interval analysis, and so on to determine the best possible scheduling of instructions.
+
+<For a detailed implementation of scheduling instructions, see the ScheduleDAGSDNodes.cpp, ScheduleDAGSDNodes.h, ScheduleDAGRRList. cpp, ScheduleDAGFast.cpp, and ScheduleDAGVLIW.cpp files located in the lib/CodeGen/SelectionDAG folder>
+
+
 
