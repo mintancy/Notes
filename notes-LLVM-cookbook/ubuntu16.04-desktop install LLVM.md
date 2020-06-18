@@ -131,7 +131,7 @@ Writing 'tmp/dag._xxx.dot'... done
 Trying 'xdg-open' program... Remember to erase graph file: /tmp/dag._xxx.dot
 ```
 
-But I got an error when try to open this dot file
+Then I got an error when try to open this dot file
 
 ```
 gvfs-open: /tmp/dag._xxx.dot: error opening location: No application is registered as bandling this file.
@@ -143,5 +143,5 @@ We can open this dot file manuly:
 $ dot -Tpng /tmp/dag._xxx.dat > test.png
 ```
 
-Then open the test.png file. But this is not so convenient. We still want to use llc command and call graphviz to open the dot file automatically. Let us find out other solutions.
+Then open the test.png file. 
 
