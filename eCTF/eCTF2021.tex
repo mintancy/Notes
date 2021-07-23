@@ -1,0 +1,147 @@
+%==============================================================================
+\documentclass[11pt,oneside,onecolumn,letterpaper]{article}
+\usepackage{times}
+\usepackage[paperwidth=8.5in, paperheight=11in,
+top=2.5cm, bottom=2.6cm, left=2.58cm, right=2.53cm]{geometry}
+%\setlength{\textheight} {9.00in}
+%\setlength{\textwidth}  {6.40in}
+%\setlength{\topmargin}  {-0.50in}
+%%\setlength{\headheight} {0.00in}
+%%\setlength{\headsep}     {0.40in}
+%\setlength{\oddsidemargin}{-0.010in}
+%\setlength{\evensidemargin}{-0.00in}
+%==============================================================================
+%\usepackage{algorithm}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{latexsym}
+\usepackage{subfigure}
+\usepackage{wrapfig}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[hyphens]{url}
+\usepackage{pifont}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage[lined, boxed, linesnumbered]{algorithm2e}
+\usepackage[square, comma, sort&compress, numbers]{natbib}
+
+\newcounter{alg}
+\newenvironment{enum-ref}{
+\begin{list}%
+{[\arabic{alg}]} {\usecounter{alg}
+  \setlength{\leftmargin} {0.25in}
+  \setlength{\labelwidth} {0.30in}
+  \setlength{\rightmargin}{0.00in}
+  \setlength{\topsep}     {0.00in}}
+}{\end{list}}
+
+\newenvironment{enum-number}{
+\begin{list}%
+{\arabic{alg})} {\usecounter{alg}
+  \setlength{\leftmargin} {0.25in}
+  \setlength{\labelwidth} {0.30in}
+  \setlength{\rightmargin}{0.00in}
+  \setlength{\topsep}     {0.00in}}
+}{\end{list}}
+
+\newenvironment{enum-nonum}{
+\begin{list}%
+{$\bullet$} {
+  \setlength{\leftmargin} {0.25in}
+  \setlength{\labelwidth} {0.30in}
+  \setlength{\rightmargin}{0.00in}
+  \setlength{\topsep}     {0.00in}}
+}{\end{list}}
+
+\let\chapter\section
+
+%==============================================================================
+\pagestyle{plain}
+%==============================================================================
+
+\title{Secure UAV Communications System Design (Write-up)}
+\author{MITRE eCTF 2021\\Team Cacti\\ University at Buffalo }
+\date{}
+
+
+
+\begin{document}
+%%
+%=============================================================================
+\normalsize
+
+
+\maketitle
+%\date{}
+
+\renewcommand{\thepage}{System Design Write-up, Team Cacti, University at Buffalo--\arabic{page}}
+\setcounter{page}{1} \normalsize
+%
+%\renewcommand{\baselinestretch}{1.2}
+%\normalsize
+%\vspace{0.1in}
+%\centerline{\textbf{\Large }}
+%\renewcommand{\baselinestretch}{1.0}
+%\normalsize
+
+\newcommand{\flagRollback}{\textsf{Rollback}\xspace}
+
+
+% \section{Reference Code Analysis}
+
+We spent a lot of time making our design pass the test.
+The lessons we learned were categorized into the following items.
+
+\begin{enumerate}
+    \item \textbf{Teamwork}\\
+    We divided the system implementation into several small tasks and assigned each task to our team members.
+    Another team member will handle the whole business logic.
+    This was very helpful and moved our work fast.
+    But there was a problem that not all of our team members have a full understanding of the whole system that made it hard to identify the bug when the system got errors at the final stage.
+
+    \item \textbf{Find a suitable open-source lib}\\
+    In our design, to protect the communication, we used asymmetric crypto (RSA).
+    The issue we meet was that the key format of the C implementation of RSA was different from the standard key format such as ASN or PKCS\#1 that python can provide.    
+    Due to the time, we did not find another lib.
+    And we fixed this issue by simply utilizing the file system to connect the python script and C applications.
+    This may introduce a race conditions problem.
+
+    \item \textbf{Plan B is important}\\
+    System design always changes through implementation.
+    Not all security designs can be deployed due to various reasons.
+    Unfortunately, we did not sign the RSA public key because of unknown issues and exposed our system to attack.
+    So a plan B will help a lot.
+
+    \item \textbf{Debug is important}\\
+    Docker was used to set up the whole system which made debugging more difficult for us.
+    We prefer to rely on IDEs to help us to debug.
+    At this moment, all codes were tested by judging the output strings.
+    This was a very bad and inefficient choice. 
+    We did not check every line of code we wrote.
+    Then we spent a lot of time finding out the bugs after failing the submission.
+    So,
+    \begin{itemize}
+        \item EVERY line of code should be debugged and confirmed.
+        \item If the system can not pass the test, it must be somewhere the code you write has a bug.
+    \end{itemize}
+
+    \item \textbf{Test all possibilities}\\
+    Before submission, there should be a comprehensive test framework to evaluate the functionality of the system. 
+    Do not just wait for the organizer's test result.
+
+    \item \textbf{Don't be shy to ask the organizer's help}\\
+    Well, we emphasize this because we wasted a lot of time checking the incomplete logs.
+    If you find that you can not identify the bug your system encounters, please ask for help.
+
+\end{enumerate}
+
+% \section{Flag Protection}
+
+% \subsection{\textsf{D}}
+
+
+\end{document}
+%==============================================================================
