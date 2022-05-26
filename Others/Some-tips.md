@@ -1,4 +1,13 @@
 
+## Tips for Markdown
+- Insert embedded images: `![test](picture_path)`
+- Tables:
+```
+|title1|title2|
+|------|------|
+|content1|content2|
+```
+
 ## No USB devices available in VirtualBox
 
 Make sure you have installed the extension for the virtualbox.
