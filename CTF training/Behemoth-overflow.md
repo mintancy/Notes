@@ -1,6 +1,12 @@
+# Tool
+```shell
+scp -P 2221 behemoth0@behemoth.labs.overthewire.org:/behemoth/behemoth0 .
+```
+
 ## level0-level1
 
-behemoth1: aesebootiv
+**solution 1**
+behemoth1: 8JHFW9vGru
 
 objdump -d
 
@@ -52,7 +58,28 @@ behemoth1
 
 $ cat /etc/behemoth_pass/behemoth1
 
-aesebootiv
+8JHFW9vGru
+```
+
+**solution 2**
+```shell
+behemoth0@gibson:/behemoth$ ltrace ./behemoth0
+__libc_start_main(0x804921d, 1, 0xffffd5e4, 0 <unfinished ...>
+printf("Password: ")                               = 10
+__isoc99_scanf(0x804a054, 0xffffd4df, 0x804a008, 0x804a020Password: asafag
+) = 1
+strlen("OK^GSYBEX^Y")                              = 11
+strcmp("asafag", "eatmyshorts")                    = -1
+puts("Access denied.."Access denied..
+)                            = 16
++++ exited (status 0) +++
+
+behemoth0@gibson:/behemoth$ ./behemoth0
+Password: eatmyshorts
+Access granted..
+$ cat /etc/behemoth_pass/behemoth1
+8JHFW9vGru
+$ exit
 ```
 
 ## level1-level2
