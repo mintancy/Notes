@@ -230,12 +230,6 @@ There are something we need to know:
 1. The size of the input region in the stack we need to make sure. 
 2. The shellcode must fit to our system, the path of bash, the 32-bit or 64-bit.
 
-
-
-
-
-
-
 behemoth2: eimahquuof
 
 ## level2-level3
