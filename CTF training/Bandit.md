@@ -315,5 +315,304 @@ YnQpBuifNMas1hcUFk70ZmqkhUU2EuaS
 
 level27 - level28
 ```shell
+bandit27@bandit:~$ mktemp -d
+/tmp/tmp.cml7af08H3
+bandit27@bandit:~$ cd /tmp/tmp.cml7af08H3
+bandit27@bandit:/tmp/tmp.cml7af08H3$ git clone ssh://bandit27-git@localhost:2220/home/bandit27-git/repo
+Cloning into 'repo'...
+The authenticity of host '[localhost]:2220 ([127.0.0.1]:2220)' can't be established.
+ED25519 key fingerprint is SHA256:C2ihUBV7ihnV1wUXRb4RrEcLfXC5CXlhmAAM/urerLY.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Could not create directory '/home/bandit27/.ssh' (Permission denied).
+Failed to add the host to the list of known hosts (/home/bandit27/.ssh/known_hosts).
+                         _                     _ _ _
+                        | |__   __ _ _ __   __| (_) |_
+                        | '_ \ / _` | '_ \ / _` | | __|
+                        | |_) | (_| | | | | (_| | | |_
+                        |_.__/ \__,_|_| |_|\__,_|_|\__|
 
+
+                      This is an OverTheWire game server.
+            More information on http://www.overthewire.org/wargames
+
+bandit27-git@localhost's password:
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (3/3), done.
+bandit27@bandit:/tmp/tmp.cml7af08H3$ ls
+repo
+bandit27@bandit:/tmp/tmp.cml7af08H3$ cd repo/
+bandit27@bandit:/tmp/tmp.cml7af08H3/repo$ ls
+README
+bandit27@bandit:/tmp/tmp.cml7af08H3/repo$ cat README
+The password to the next level is: AVanL161y9rsbcJIsFHuw35rjaOM19nR
+```
+
+level28 - level29
+```shell
+bandit28@bandit:/tmp/tmp.l9j1w7IqnX/repo$ git config --list
+user.email=noone@overthewire.org
+user.name=Ben Dover
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=ssh://bandit28-git@localhost:2220/home/bandit28-git/repo
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+bandit28@bandit:/tmp/tmp.l9j1w7IqnX/repo$ ls -al
+total 16
+drwxrwxr-x 3 bandit28 bandit28 4096 Nov  4 20:14 .
+drwx------ 3 bandit28 bandit28 4096 Nov  4 20:14 ..
+drwxrwxr-x 8 bandit28 bandit28 4096 Nov  4 20:22 .git
+-rw-rw-r-- 1 bandit28 bandit28  111 Nov  4 20:14 README.md
+bandit28@bandit:/tmp/tmp.l9j1w7IqnX/repo$ ls
+README.md
+bandit28@bandit:/tmp/tmp.l9j1w7IqnX/repo$ git log
+commit 43032edb2fb868dea2ceda9cb3882b2c336c09ec (HEAD -> master, origin/master, origin/HEAD)
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu Sep 1 06:30:25 2022 +0000
+
+    fix info leak
+
+commit bdf3099fb1fb05faa29e80ea79d9db1e29d6c9b9
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu Sep 1 06:30:25 2022 +0000
+
+    add missing data
+
+commit 43d032b360b700e881e490fbbd2eee9eccd7919e
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:24 2022 +0000
+
+    initial commit of README.md
+
+bandit28@bandit:/tmp/tmp.l9j1w7IqnX/repo$ git log -p -1
+commit 43032edb2fb868dea2ceda9cb3882b2c336c09ec (HEAD -> master, origin/master, origin/HEAD)
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu Sep 1 06:30:25 2022 +0000
+
+    fix info leak
+
+diff --git a/README.md b/README.md
+index b302105..5c6457b 100644
+--- a/README.md
++++ b/README.md
+@@ -4,5 +4,5 @@ Some notes for level29 of bandit.
+ ## credentials
+
+ - username: bandit29
+-- password: tQKvmcwNYcFS6vmPHIUSI3ShmsrQZK8S
++- password: xxxxxxxxxx
+```
+
+level29 - level30
+```shell
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ cat README.md
+# Bandit Notes
+Some notes for bandit30 of bandit.
+
+## credentials
+
+- username: bandit30
+- password: <no passwords in production!>
+
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git log
+commit 1748acec99ba66676acd551c2932fb9fc14a98a3 (HEAD -> master, origin/master, origin/HEAD)
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    fix username
+
+commit c27fff763003bb1d57d311e6763211110b94cc87
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    initial commit of README.md
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git branch
+* master
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git log -p -1
+commit 1748acec99ba66676acd551c2932fb9fc14a98a3 (HEAD -> master, origin/master, origin/HEAD)
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    fix username
+
+diff --git a/README.md b/README.md
+index 2da2f39..1af21d3 100644
+--- a/README.md
++++ b/README.md
+@@ -3,6 +3,6 @@ Some notes for bandit30 of bandit.
+
+ ## credentials
+
+-- username: bandit29
++- username: bandit30
+ - password: <no passwords in production!>
+
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git branch -r
+  origin/HEAD -> origin/master
+  origin/dev
+  origin/master
+  origin/sploits-dev
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git checkout dev
+Branch 'dev' set up to track remote branch 'dev' from 'origin'.
+Switched to a new branch 'dev'
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git branch
+* dev
+  master
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git log
+commit 2b1395f00cfb986163082c50100be5be8f249f64 (HEAD -> dev, origin/dev)
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    add data needed for development
+
+commit 989df8073e16b5f7ec337f51bc1f60bd2f6b7e0b
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    add gif2ascii
+
+commit 1748acec99ba66676acd551c2932fb9fc14a98a3 (origin/master, origin/HEAD, master)
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    fix username
+
+commit c27fff763003bb1d57d311e6763211110b94cc87
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    initial commit of README.md
+bandit29@bandit:/tmp/tmp.tDhy5zyEVG/repo$ git log -p -1
+commit 2b1395f00cfb986163082c50100be5be8f249f64 (HEAD -> dev, origin/dev)
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu Sep 1 06:30:26 2022 +0000
+
+    add data needed for development
+
+diff --git a/README.md b/README.md
+index 1af21d3..a4b1cf1 100644
+--- a/README.md
++++ b/README.md
+@@ -4,5 +4,5 @@ Some notes for bandit30 of bandit.
+ ## credentials
+
+ - username: bandit30
+-- password: <no passwords in production!>
++- password: xbhV3HpNGlTIdnjUrdAlPzc2L6y9EOnS
+```
+
+level30 - level31
+```shell
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie$ ls
+repo
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie$ cd repo/
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie/repo$ ls
+README.md
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie/repo$ cat README.md
+just an epmty file... muahaha
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie/repo$ git log
+commit a325f29e1cc26b0f0dc5f89b4348e389b408cc87 (HEAD -> master, origin/master, origin/HEAD)
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu Sep 1 06:30:28 2022 +0000
+
+    initial commit of README.md
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie/repo$ git branch -r
+  origin/HEAD -> origin/master
+  origin/master
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie/repo$ git tag
+secret
+bandit30@bandit:/tmp/tmp.9BKF1Bcoie/repo$ git show secret
+OoffzGDlzhAlerFJ2cAiz1D41JW1Mhmt
+```
+
+level31 - level32
+```shell
+bandit31@bandit:/tmp/tmp.dueSKYQYba/repo$ git add -f key.txt
+bandit31@bandit:/tmp/tmp.dueSKYQYba/repo$ git commit -m "test"
+[master 5a015fb] test
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+bandit31@bandit:/tmp/tmp.dueSKYQYba/repo$ git push origin master
+The authenticity of host '[localhost]:2220 ([127.0.0.1]:2220)' can't be established.
+ED25519 key fingerprint is SHA256:C2ihUBV7ihnV1wUXRb4RrEcLfXC5CXlhmAAM/urerLY.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Could not create directory '/home/bandit31/.ssh' (Permission denied).
+Failed to add the host to the list of known hosts (/home/bandit31/.ssh/known_hosts).
+                         _                     _ _ _
+                        | |__   __ _ _ __   __| (_) |_
+                        | '_ \ / _` | '_ \ / _` | | __|
+                        | |_) | (_| | | | | (_| | | |_
+                        |_.__/ \__,_|_| |_|\__,_|_|\__|
+
+
+                      This is an OverTheWire game server.
+            More information on http://www.overthewire.org/wargames
+
+bandit31-git@localhost's password:
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (6/6), 527 bytes | 527.00 KiB/s, done.
+Total 6 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: ### Attempting to validate files... ####
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+remote: Well done! Here is the password for the next level:
+remote: rmCBvG56y58BXzv98yZGdO7ATVL5dW8y
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+remote: Wrong!
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+To ssh://localhost:2220/home/bandit31-git/repo
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'ssh://localhost:2220/home/bandit31-git/repo'
+bandit31@bandit:/tmp/tmp.dueSKYQYba/repo$ cat key.txt
+May I come in?
+```
+
+level32 - level33
+```shell
+WELCOME TO THE UPPERCASE SHELL
+>> ls
+sh: 1: LS: not found
+>> LS
+sh: 1: LS: not found
+>> $0
+$ pwd
+/home/bandit32
+$ cat /etc/bandit_passwd/bandit33
+cat: /etc/bandit_passwd/bandit33: No such file or directory
+$ cat /etc/bandit_pass/bandit33
+odHo63fHiFqcWWJG9rLiLDtPm45KzUKy
+$
+```
+
+level33 - level34
+```shell
+bandit33@bandit:~$ ls
+README.txt
+bandit33@bandit:~$ cat README.txt
+Congratulations on solving the last level of this game!
+
+At this moment, there are no more levels to play in this game. However, we are constantly working
+on new levels and will most likely expand this game with more levels soon.
+Keep an eye out for an announcement on our usual communication channels!
+In the meantime, you could play some of our other wargames.
+
+If you have an idea for an awesome new level, please let us know!
 ```
